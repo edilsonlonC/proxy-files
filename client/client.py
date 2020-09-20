@@ -5,7 +5,7 @@ import json
 import sys
 from hashlib import sha256
 from getpass import getpass
-from utilies import string_response
+from utilities import string_response
 
 files = {}
 size = 1024 * 1024 * 10
