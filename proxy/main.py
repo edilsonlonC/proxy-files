@@ -83,7 +83,17 @@ def register(files):
     db.users.insert_one({'username': username , 'password':password})
     socket.send_multipart([json.dumps({'user_saved':True}).encode('utf-8')])
     
-    
+def server_on(request):
+    port = request.get('port')
+    address = request.get('address')
+    print(port,address)
+    query = {'address':address, 'port':port}
+    server = db.servers.find_one(query)
+    print(server)
+    if not server:
+        db.servers.insert_one(query)
+    socket.send_multipart([json.dumps({'server_on':True}).encode('utf-8')])
+    return    
 
 
 def decide_command(request):
@@ -94,7 +104,8 @@ def decide_command(request):
         register(request)
     elif command == 'download':
         download(request)
-
+    elif command == 'server_on':
+        server_on(request)
 
 
 def main():

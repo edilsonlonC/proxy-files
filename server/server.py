@@ -2,11 +2,37 @@
 import zmq
 import sys
 import json
+import os
 
 context = zmq.Context()
 socket = context.socket(zmq.REP)
 port = sys.argv[1]
 socket.bind(f"tcp://*:{port}")
+#address proxy 
+server_info = {}
+
+def send_info_proxy(address):
+    context_proxy = zmq.Context()
+    socket_proxy = context_proxy.socket(zmq.REQ)
+    socket_proxy.connect(f"tcp://{address}")
+    socket_proxy.send_multipart([json.dumps(server_info).encode('utf-8')])
+    response_proxy = socket_proxy.recv_multipart()
+    print(response_proxy)
+
+
+def get_args():
+    address_proxy = sys.argv[2]
+    files_folder = sys.argv[3]
+    if not os.path.isdir(files_folder):
+        os.mkdir(files_folder)
+    server_info['files_folder'] = files_folder
+    server_info['port'] = port
+    server_info['address'] = 'localhost'
+    server_info['command'] = 'server_on'
+    send_info_proxy(address_proxy)
+    
+    return
+
 
 def upload(request):
     filename = request.get('filename').decode('utf-8')
@@ -45,6 +71,6 @@ def main():
 
 
 if __name__ == '__main__':
-    
+    get_args()
     main()
     
