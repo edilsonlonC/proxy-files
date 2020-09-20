@@ -37,14 +37,16 @@ def get_args():
 def upload(request):
     filename = request.get('filename').decode('utf-8')
     bytes_to_save = request.get('bytes')
-    with open(f"files/{filename}", "wb") as f:
+    files_folder = server_info.get('files_folder')
+    with open(f"{files_folder}/{filename}", "wb") as f:
         f.write(bytes_to_save)
     socket.send_multipart([json.dumps({'file_saved': True}).encode('utf-8')])
 
         
 def download(request):
     filename = request.get('filename').decode('utf-8')
-    with open(f"files/{filename}",'rb') as f:
+    files_folder = server_info.get('files_folder')
+    with open(f"{files_folder}/{filename}",'rb') as f:
         download_bytes =  f.read()
     socket.send_multipart([download_bytes])
 
