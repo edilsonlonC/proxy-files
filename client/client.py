@@ -58,6 +58,10 @@ def list_files(args):
     socket.send_multipart([json.dumps(files).encode("utf-8")])
     response = socket.recv_multipart()
     files_list = json.loads(response[0])
+    if not isinstance(files_list,list):
+        if files_list.get('unauthorized'):
+            print('access denied')
+            return
     message = string_response(files_list)
     print(message)
     return
@@ -78,6 +82,12 @@ def get_servers_proxy(args):
         json_response = json.loads(response[0])
         if json_response.get("file_exist"):
             print("file exist")
+            return
+        elif json_response.get('unauthorized'):
+            print('acces dienied')
+            return
+        elif json_response.get('serversNotFound'):
+            print('servers not found')
             return
 
         upload(json_response, filename)
@@ -117,7 +127,10 @@ def proxy_download(args):
     response = socket.recv_multipart()
     json_response = json.loads(response[0])
     if json_response.get("FileNotFound"):
-        print("file does not exist")
+        print("file does not exists")
+        return
+    if json_response.get('unauthorized'):
+        print("access denied")
         return
     download(json_response, files.get("filename"))
 

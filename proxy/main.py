@@ -46,7 +46,12 @@ def save_file(request):
 def choose_server(request):
     hash_parts = request.get("hash_parts")
     number_servers = db.servers.count_documents({})
-    servers = db.servers.find({}, {"address": 1, "port": 1, "_id": 0})
+    servers =  db.servers.find({}, {"address": 1, "port": 1, "_id": 0})
+    print(number_servers)
+    print(servers)
+    if number_servers == 0:
+        socket.send_multipart([json.dumps({'serversNotFound':True}).encode('utf-8')])
+        return
     server_itr = 0
     server_list = list()
     for h in hash_parts:
@@ -133,6 +138,11 @@ def list_files(request):
 
 
 def decide_command(request):
+    username = request.get('username')
+    password = request.get('password')
+    if not user_exist(username,password):
+        socket.send_multipart([json.dumps({'unauthorized':True}).encode('utf-8')])
+        return
     command = request.get("command")
     if command == "upload":
         upload(request)
