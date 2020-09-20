@@ -19,6 +19,15 @@ def send_info_proxy(address):
     response_proxy = socket_proxy.recv_multipart()
     print(response_proxy)
 
+def send_info_proxy_off():
+    address = server_info.get('address_proxy')
+    context_proxy = zmq.Context()
+    socket_proxy = context_proxy.socket(zmq.REQ)
+    socket_proxy.connect(f"tcp://{address}")
+    socket_proxy.send_multipart([json.dumps(server_info).encode('utf-8')])
+    response_proxy = socket_proxy.recv_multipart()
+    print(response_proxy)
+
 
 def get_args():
     address_proxy = sys.argv[2]
@@ -27,6 +36,7 @@ def get_args():
         os.mkdir(files_folder)
     server_info['files_folder'] = files_folder
     server_info['port'] = port
+    server_info['address_proxy'] = address_proxy
     server_info['address'] = 'localhost'
     server_info['command'] = 'server_on'
     send_info_proxy(address_proxy)
@@ -73,6 +83,13 @@ def main():
 
 
 if __name__ == '__main__':
-    get_args()
-    main()
-    
+   
+    try:
+        get_args()
+        main()
+    except KeyboardInterrupt:
+        server_info['command'] = 'server_off'
+        send_info_proxy_off()
+        print('server off')
+        exit(0)
+

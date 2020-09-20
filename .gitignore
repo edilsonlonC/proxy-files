@@ -1,3 +1,4 @@
 /server/files*/*
 /client/*.mp4
 /proxy/database/__pycache__
+*/__pycache__

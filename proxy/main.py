@@ -93,7 +93,25 @@ def server_on(request):
     if not server:
         db.servers.insert_one(query)
     socket.send_multipart([json.dumps({'server_on':True}).encode('utf-8')])
-    return    
+    return 
+
+
+def server_off(request):
+    port = request.get('port')
+    address = request.get('address')
+    delete_server=db.servers.delete_one({ 'address':address, 'port':port})
+    print(delete_server)
+    socket.send_multipart([json.dumps({'server_off': True}).encode('utf-8')])
+    print(port,address)
+    return
+
+
+def list_files (request):
+    username = request.get('username')
+    files = list(db.files.find({'username': username},{'hash_parts':0 , 'servers':0,'_id':0 ,'username':0}))
+    print(files)
+    socket.send_multipart([json.dumps(files).encode('utf-8')])
+    return
 
 
 def decide_command(request):
@@ -106,7 +124,10 @@ def decide_command(request):
         download(request)
     elif command == 'server_on':
         server_on(request)
-
+    elif command == 'list':
+        list_files(request)
+    elif command == 'server_off':
+        server_off(request)
 
 def main():
     print('server is running on port 5556')

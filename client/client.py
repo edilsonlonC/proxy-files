@@ -5,6 +5,7 @@ import json
 import sys
 from hashlib import sha256 
 from getpass import getpass
+from utilies import string_response
 
 files = {}
 size = 1024 * 1024 * 10
@@ -43,7 +44,14 @@ def get_hash(files):
             hash_list.append(m.hexdigest())
     return hash_list
 
-
+def list_files(args):
+    files['username'] = args[1]
+    socket.send_multipart([json.dumps(files).encode('utf-8')])
+    response = socket.recv_multipart()
+    files_list = json.loads(response[0])
+    message = string_response(files_list)
+    print(message)
+    return
 
 
 def get_servers_proxy (args):
@@ -118,6 +126,8 @@ def decide_command():
         register(args)
     elif command == 'download':
         proxy_download(args)
+    elif command == 'list':
+        list_files(args)
     else:
         socket.send_multipart([b'prueba'])
         response = socket.recv_multipart()
