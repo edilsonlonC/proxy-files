@@ -1,9 +1,9 @@
 #!/home/edilson/anaconda3/bin/python3.8
 
-import zmq 
+import zmq
 import json
 import sys
-from hashlib import sha256 
+from hashlib import sha256
 from getpass import getpass
 from utilies import string_response
 
@@ -13,26 +13,34 @@ context = zmq.Context()
 socket = context.socket(zmq.REQ)
 socket.connect("tcp://localhost:5556")
 
-def upload(response_proxy,filename):
-    
-    servers_list = response_proxy.get('servers')
-    parts_hash = response_proxy.get('hash_parts')
-    file = open(filename,'rb')
+
+def upload(response_proxy, filename):
+
+    servers_list = response_proxy.get("servers")
+    parts_hash = response_proxy.get("hash_parts")
+    file = open(filename, "rb")
     for s in range(len(servers_list)):
         bytes_to_send = file.read(size)
-        address = servers_list[s]['address']
-        port = servers_list[s]['port']
+        address = servers_list[s]["address"]
+        port = servers_list[s]["port"]
         context_server = zmq.Context()
         socket_server = context_server.socket(zmq.REQ)
         socket_server.connect(f"tcp://{address}:{port}")
-        socket_server.send_multipart([parts_hash[s].encode('utf-8'),files.get('command').encode('utf-8'),bytes_to_send                                                      ])
+        socket_server.send_multipart(
+            [
+                parts_hash[s].encode("utf-8"),
+                files.get("command").encode("utf-8"),
+                bytes_to_send,
+            ]
+        )
         response = socket_server.recv_multipart()
     return
 
+
 def get_hash(files):
-    filename = files.get('filename')
+    filename = files.get("filename")
     hash_list = list()
-    with open(filename,'rb') as f:
+    with open(filename, "rb") as f:
         m = sha256()
         _bytes = f.read(size)
         m.update(_bytes)
@@ -44,9 +52,10 @@ def get_hash(files):
             hash_list.append(m.hexdigest())
     return hash_list
 
+
 def list_files(args):
-    files['username'] = args[1]
-    socket.send_multipart([json.dumps(files).encode('utf-8')])
+    files["username"] = args[1]
+    socket.send_multipart([json.dumps(files).encode("utf-8")])
     response = socket.recv_multipart()
     files_list = json.loads(response[0])
     message = string_response(files_list)
@@ -54,87 +63,90 @@ def list_files(args):
     return
 
 
-def get_servers_proxy (args):
+def get_servers_proxy(args):
     if len(args) < 3:
-        print('arguments are misssed')
+        print("arguments are misssed")
         return
     filename = args[1]
-    files['filename'] = filename
-    files['hash_parts'] = get_hash(files)
+    files["filename"] = filename
+    files["hash_parts"] = get_hash(files)
     try:
-        file = open(f"{filename}",'rb')
+        file = open(f"{filename}", "rb")
         bytes_to_send = file.read()
-        socket.send_multipart([json.dumps(files).encode('utf-8')])
+        socket.send_multipart([json.dumps(files).encode("utf-8")])
         response = socket.recv_multipart()
         json_response = json.loads(response[0])
-        if(json_response.get('file_exist')):
-            print('file exist')
+        if json_response.get("file_exist"):
+            print("file exist")
             return
-        
-        upload(json_response,filename)
+
+        upload(json_response, filename)
     except FileNotFoundError:
         print(f"the file {filename} doesn't exist")
-   
+
+
 def register(args):
-    files['username'] = args[1]
-    socket.send_multipart([json.dumps(files).encode('utf-8')])
+    files["username"] = args[1]
+    socket.send_multipart([json.dumps(files).encode("utf-8")])
     response = socket.recv_multipart()
     return
 
 
-def download(response,filename):
-    hash_parts = response.get('hash_parts')
-    servers = response.get('servers')
-    command = response.get('command')
-    with open(filename,'ab') as f:
+def download(response, filename):
+    hash_parts = response.get("hash_parts")
+    servers = response.get("servers")
+    command = response.get("command")
+    with open(filename, "ab") as f:
         for s in range(len(servers)):
-            address = servers[s].get('address')
-            port = servers[s].get('port')
+            address = servers[s].get("address")
+            port = servers[s].get("port")
             context_server = zmq.Context()
             socket_server = context_server.socket(zmq.REQ)
             socket_server.connect(f"tcp://{address}:{port}")
-            socket_server.send_multipart([hash_parts[s].encode('utf-8'),files.get('command').encode('utf-8')])
+            socket_server.send_multipart(
+                [hash_parts[s].encode("utf-8"), files.get("command").encode("utf-8")]
+            )
             response = socket_server.recv_multipart()
             f.write(response[0])
 
 
 def proxy_download(args):
-        files['filename'] = args[1]
-        files['username'] = args[2]
-        socket.send_multipart([json.dumps(files).encode('utf-8')])
-        response = socket.recv_multipart()
-        json_response = json.loads(response[0])
-        if(json_response.get('FileNotFound')):
-            print('file does not exist')
-            return
-        download(json_response,files.get('filename'))
-    
+    files["filename"] = args[1]
+    files["username"] = args[2]
+    socket.send_multipart([json.dumps(files).encode("utf-8")])
+    response = socket.recv_multipart()
+    json_response = json.loads(response[0])
+    if json_response.get("FileNotFound"):
+        print("file does not exist")
+        return
+    download(json_response, files.get("filename"))
 
 
 def decide_command():
     if len(sys.argv) <= 1:
-        print('arguments are missing')
+        print("arguments are missing")
         return
     args = sys.argv[1:]
     command = args[0]
-    files['password'] = getpass()
-    files['command'] = command
-    if command == 'upload':
-        files['username'] = args[2]
+    files["password"] = getpass()
+    files["command"] = command
+    if command == "upload":
+        files["username"] = args[2]
         get_servers_proxy(args)
-    elif command == 'register':
+    elif command == "register":
         register(args)
-    elif command == 'download':
+    elif command == "download":
         proxy_download(args)
-    elif command == 'list':
+    elif command == "list":
         list_files(args)
     else:
-        socket.send_multipart([b'prueba'])
+        socket.send_multipart([b"prueba"])
         response = socket.recv_multipart()
+
 
 def main():
     decide_command()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
-    
