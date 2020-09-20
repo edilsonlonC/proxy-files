@@ -13,7 +13,7 @@ socket.bind("tcp://*:5556")
 
 
 def check_file(filename,ext,username,password):
-    file = db.users.find_one({'username': username,'password':password,f"{filename}.ext":ext})
+    file = db.files.find_one({'username': username,'filename':filename})
     return True if file else False
 
 def save_file(request):
@@ -23,12 +23,13 @@ def save_file(request):
     hash_parts = request.get('hash_parts')
     servers = request.get('servers')
     name, ext = filename.rsplit(".",1)
-    if check_file(name,ext,username,password):
+    if check_file(filename,ext,username,password):
         socket.send_multipart([json.dumps({'file_exist':True}).encode('utf-8')])
         return False
-    query = {'$and':[{'username': username} , { 'password':password}]}
-    values = {'$set':{name: {'hash_parts':hash_parts,'servers': servers,'ext':ext}}}
-    db.users.update_one(query,values)
+    #query = {'$and':[{'username': username} , { 'password':password}]}
+    # values = {'$set':{name: {'hash_parts':hash_parts,'servers': servers,'ext':ext}}}
+    # db.users.update_one(query,values)
+    db.files.insert_one({'filename':filename,'hash_parts':hash_parts,'servers':servers,'username':username})
     return True
     
 
@@ -59,8 +60,13 @@ def download(request):
     filename = request.get('filename')
     username = request.get('username')
     password = request.get('password')
-    name,ext = filename.rsplit('.',1)
-    hash_and_servers =  db.users.find_one({'username': username,'password':password,f"{name}.ext":ext},{name:1,'_id':0})
+    print(username,filename)
+    # name,ext = filename.rsplit('.',1)
+    # hash_and_servers =  db.users.find_one({'username': username,'password':password,f"{name}.ext":ext},{name:1,'_id':0})
+    hash_and_servers = db.files.find_one({'username':username,'filename': filename},{'_id':0}) #TODO check if file exist en db
+    if not hash_and_servers:
+        socket.send_multipart([json.dumps({'FileNotFound':True}).encode('utf-8')])
+        return 
     hash_and_servers['command'] = request.get('command')
     socket.send_multipart([json.dumps(hash_and_servers).encode('utf-8')])
 

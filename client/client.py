@@ -96,8 +96,10 @@ def proxy_download(args):
         socket.send_multipart([json.dumps(files).encode('utf-8')])
         response = socket.recv_multipart()
         json_response = json.loads(response[0])
-        filename,ext = files.get('filename').rsplit('.',1)
-        download(json_response.get(filename),files.get('filename'))
+        if(json_response.get('FileNotFound')):
+            print('file does not exist')
+            return
+        download(json_response,files.get('filename'))
     
 
 
