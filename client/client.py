@@ -5,7 +5,8 @@ import json
 import sys
 from hashlib import sha256
 from getpass import getpass
-from utilities import string_response
+from utilities import string_response , get_newname
+import os
 
 files = {}
 size = 1024 * 1024 * 10
@@ -36,6 +37,9 @@ def upload(response_proxy, filename):
         response = socket_server.recv_multipart()
     return
 
+def filename_exist(filename):
+    return os.path.isfile(filename)
+
 
 def get_hash(files):
     filename = files.get("filename")
@@ -63,7 +67,6 @@ def list_files(args):
             print("access denied")
             return
     message = string_response(files_list)
-    print(message)
     return
 
 
@@ -84,7 +87,7 @@ def get_servers_proxy(args):
             print("file exist")
             return
         elif json_response.get("unauthorized"):
-            print("acces dienied")
+            print("access dienied")
             return
         elif json_response.get("serversNotFound"):
             print("servers not found")
@@ -106,6 +109,8 @@ def download(response, filename):
     hash_parts = response.get("hash_parts")
     servers = response.get("servers")
     command = response.get("command")
+    if files.get('filename'):
+        filename = files.get('new_name')
     with open(filename, "ab") as f:
         for s in range(len(servers)):
             address = servers[s].get("address")
@@ -123,9 +128,14 @@ def download(response, filename):
 def proxy_download(args):
     files["filename"] = args[1]
     files["username"] = args[2]
+    filename = files.get('filename') 
+    if filename_exist(filename):
+        new_name = get_newname(filename,os.listdir())
+        files['new_name'] = new_name
     socket.send_multipart([json.dumps(files).encode("utf-8")])
     response = socket.recv_multipart()
     json_response = json.loads(response[0])
+   
     if json_response.get("FileNotFound"):
         print("file does not exists")
         return

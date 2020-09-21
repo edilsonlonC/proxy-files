@@ -140,10 +140,11 @@ def list_files(request):
 def decide_command(request):
     username = request.get("username")
     password = request.get("password")
-    if not user_exist(username, password):
+    command = request.get("command")
+    if not user_exist(username, password) and command != 'server_on' and command != 'server_off':
         socket.send_multipart([json.dumps({"unauthorized": True}).encode("utf-8")])
         return
-    command = request.get("command")
+    
     if command == "upload":
         upload(request)
     elif command == "register":
