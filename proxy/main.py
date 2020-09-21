@@ -47,8 +47,6 @@ def choose_server(request):
     hash_parts = request.get("hash_parts")
     number_servers = db.servers.count_documents({})
     servers = db.servers.find({}, {"address": 1, "port": 1, "_id": 0})
-    print(number_servers)
-    print(servers)
     if number_servers == 0:
         socket.send_multipart([json.dumps({"serversNotFound": True}).encode("utf-8")])
         return
@@ -73,7 +71,6 @@ def download(request):
     filename = request.get("filename")
     username = request.get("username")
     password = request.get("password")
-    print(username, filename)
     # name,ext = filename.rsplit('.',1)
     # hash_and_servers =  db.users.find_one({'username': username,'password':password,f"{name}.ext":ext},{name:1,'_id':0})
     hash_and_servers = db.files.find_one(
@@ -104,10 +101,8 @@ def register(files):
 def server_on(request):
     port = request.get("port")
     address = request.get("address")
-    print(port, address)
     query = {"address": address, "port": port}
     server = db.servers.find_one(query)
-    print(server)
     if not server:
         db.servers.insert_one(query)
     socket.send_multipart([json.dumps({"server_on": True}).encode("utf-8")])
@@ -118,9 +113,7 @@ def server_off(request):
     port = request.get("port")
     address = request.get("address")
     delete_server = db.servers.delete_one({"address": address, "port": port})
-    print(delete_server)
     socket.send_multipart([json.dumps({"server_off": True}).encode("utf-8")])
-    print(port, address)
     return
 
 
@@ -132,7 +125,6 @@ def list_files(request):
             {"hash_parts": 0, "servers": 0, "_id": 0, "username": 0},
         )
     )
-    print(files)
     socket.send_multipart([json.dumps(files).encode("utf-8")])
     return
 
