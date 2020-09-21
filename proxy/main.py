@@ -141,10 +141,14 @@ def decide_command(request):
     username = request.get("username")
     password = request.get("password")
     command = request.get("command")
-    if not user_exist(username, password) and command != 'server_on' and command != 'server_off':
+    if (
+        not user_exist(username, password)
+        and command != "server_on"
+        and command != "server_off"
+    ):
         socket.send_multipart([json.dumps({"unauthorized": True}).encode("utf-8")])
         return
-    
+
     if command == "upload":
         upload(request)
     elif command == "register":
