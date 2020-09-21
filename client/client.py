@@ -22,7 +22,7 @@ def upload(response_proxy, filename):
     file = open(filename, "rb")
     register_server = list()
     socket_instance = list()
-    print('uploading file')
+    print("uploading file")
     for s in range(len(servers_list)):
         bytes_to_send = file.read(size)
         try:
@@ -133,7 +133,7 @@ def download(response, filename):
     with open(filename, "ab") as f:
         register_server = list()
         socket_instance = list()
-        print('downloading file')
+        print("downloading file")
         for s in range(len(servers)):
             try:
                 index = register_server.index(servers[s])
