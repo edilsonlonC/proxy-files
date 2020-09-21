@@ -109,7 +109,7 @@ def download(response, filename):
     hash_parts = response.get("hash_parts")
     servers = response.get("servers")
     command = response.get("command")
-    if files.get('filename'):
+    if files.get('new_name'):
         filename = files.get('new_name')
     with open(filename, "ab") as f:
         for s in range(len(servers)):
