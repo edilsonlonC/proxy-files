@@ -22,7 +22,6 @@ def upload(response_proxy, filename):
     file = open(filename, "rb")
     register_server = list()
     socket_instance = list()
-    print("uploading file")
     for s in range(len(servers_list)):
         bytes_to_send = file.read(size)
         try:
