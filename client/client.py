@@ -142,11 +142,9 @@ def download(response, filename):
                             files.get("command").encode("utf-8"),
                         ]
                 )
-                print(sockets_instanced)
                 response = socket.recv_multipart()
                 f.write(response[0])
             else :
-
                 address = servers[s]["address"]
                 port = servers[s]["port"]
                 context_server = zmq.Context()
