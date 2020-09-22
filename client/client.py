@@ -20,29 +20,29 @@ def upload(response_proxy, filename):
     servers_list = response_proxy.get("servers")
     parts_hash = response_proxy.get("hash_parts")
     file = open(filename, "rb")
-    register_server = list()
-    socket_instance = list()
+    sockets_instanced = {}
     for s in range(len(servers_list)):
         bytes_to_send = file.read(size)
-        try:
-            index = register_server.index(servers_list[s])
-            socket_instance[index].send_multipart(
-                [
+        json_server = json.dumps(servers_list[s])
+        socket = sockets_instanced.get(json_server)
+        if socket:
+            socket.send_multipart(
+                 [
                     parts_hash[s].encode("utf-8"),
                     files.get("command").encode("utf-8"),
                     bytes_to_send,
                 ]
             )
-            response = socket_instance[index].recv_multipart()
+            print(sockets_instanced)
+            response = socket.recv_multipart()
+        else :
 
-        except ValueError:
             address = servers_list[s]["address"]
             port = servers_list[s]["port"]
             context_server = zmq.Context()
             socket_server = context_server.socket(zmq.REQ)
             socket_server.connect(f"tcp://{address}:{port}")
-            register_server.append(servers_list[s])
-            socket_instance.append(socket_server)
+            sockets_instanced[json_server] = socket_server
             socket_server.send_multipart(
                 [
                     parts_hash[s].encode("utf-8"),
@@ -130,37 +130,38 @@ def download(response, filename):
     if files.get("new_name"):
         filename = files.get("new_name")
     with open(filename, "ab") as f:
-        register_server = list()
-        socket_instance = list()
+        sockets_instanced = {}
         print("downloading file")
         for s in range(len(servers)):
-            try:
-                index = register_server.index(servers[s])
-                socket_instance[index].send_multipart(
-                    [
-                        hash_parts[s].encode("utf-8"),
-                        files.get("command").encode("utf-8"),
-                    ]
+            json_server = json.dumps(servers[s])
+            socket = sockets_instanced.get(json_server)
+            if socket:
+                socket.send_multipart(
+                   [
+                            hash_parts[s].encode("utf-8"),
+                            files.get("command").encode("utf-8"),
+                        ]
                 )
-                response = socket_instance[index].recv_multipart()
+                print(sockets_instanced)
+                response = socket.recv_multipart()
                 f.write(response[0])
-            except ValueError:
-                address = servers[s].get("address")
-                port = servers[s].get("port")
+            else :
+
+                address = servers[s]["address"]
+                port = servers[s]["port"]
                 context_server = zmq.Context()
                 socket_server = context_server.socket(zmq.REQ)
                 socket_server.connect(f"tcp://{address}:{port}")
-                register_server.append(servers[s])
-                socket_instance.append(socket_server)
+                sockets_instanced[json_server] = socket_server
                 socket_server.send_multipart(
                     [
-                        hash_parts[s].encode("utf-8"),
-                        files.get("command").encode("utf-8"),
-                    ]
+                            hash_parts[s].encode("utf-8"),
+                            files.get("command").encode("utf-8"),
+                        ]
                 )
                 response = socket_server.recv_multipart()
                 f.write(response[0])
-                print("instance in download")
+
 
 
 def proxy_download(args):
