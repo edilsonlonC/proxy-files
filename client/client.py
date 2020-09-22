@@ -27,7 +27,7 @@ def upload(response_proxy, filename):
         socket = sockets_instanced.get(json_server)
         if socket:
             socket.send_multipart(
-                 [
+                [
                     parts_hash[s].encode("utf-8"),
                     files.get("command").encode("utf-8"),
                     bytes_to_send,
@@ -35,7 +35,7 @@ def upload(response_proxy, filename):
             )
             print(sockets_instanced)
             response = socket.recv_multipart()
-        else :
+        else:
 
             address = servers_list[s]["address"]
             port = servers_list[s]["port"]
@@ -137,14 +137,14 @@ def download(response, filename):
             socket = sockets_instanced.get(json_server)
             if socket:
                 socket.send_multipart(
-                   [
-                            hash_parts[s].encode("utf-8"),
-                            files.get("command").encode("utf-8"),
-                        ]
+                    [
+                        hash_parts[s].encode("utf-8"),
+                        files.get("command").encode("utf-8"),
+                    ]
                 )
                 response = socket.recv_multipart()
                 f.write(response[0])
-            else :
+            else:
                 address = servers[s]["address"]
                 port = servers[s]["port"]
                 context_server = zmq.Context()
@@ -153,13 +153,12 @@ def download(response, filename):
                 sockets_instanced[json_server] = socket_server
                 socket_server.send_multipart(
                     [
-                            hash_parts[s].encode("utf-8"),
-                            files.get("command").encode("utf-8"),
-                        ]
+                        hash_parts[s].encode("utf-8"),
+                        files.get("command").encode("utf-8"),
+                    ]
                 )
                 response = socket_server.recv_multipart()
                 f.write(response[0])
-
 
 
 def proxy_download(args):
