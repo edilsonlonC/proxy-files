@@ -82,11 +82,11 @@ def list_files(args):
         if files_list.get("unauthorized"):
             print("access denied")
             return
-    
+
     if not files_list:
         print("you don't have files")
         return
-        
+
     message = string_response(files_list)
     print(message)
     return
