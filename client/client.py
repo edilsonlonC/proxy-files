@@ -124,7 +124,13 @@ def register(args):
     files["username"] = args[1]
     socket.send_multipart([json.dumps(files).encode("utf-8")])
     response = socket.recv_multipart()
-    return
+    json_response = json.loads(response[0])
+    if json_response.get("user_saved"):
+        print(f"the user f{files.get('username')} was created")
+        return
+    if json_response.get("user_exist"):
+        print(f"the user {files.get('username')} already exists")
+        return
 
 
 def download(response, filename):
@@ -203,8 +209,8 @@ def decide_command():
     elif command == "list":
         list_files(args)
     else:
-        socket.send_multipart([b"prueba"])
-        response = socket.recv_multipart()
+        print("the command doesn't exist")
+        return
 
 
 def main():

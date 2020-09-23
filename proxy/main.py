@@ -83,6 +83,11 @@ def download(request):
     socket.send_multipart([json.dumps(hash_and_servers).encode("utf-8")])
 
 
+def username_exist(username):
+    user = db.users.find_one({"username": username})
+    return True if user else False
+
+
 def user_exist(username, password):
     user = db.users.find_one({"username": username, "password": password})
     return True if user else False
@@ -91,7 +96,7 @@ def user_exist(username, password):
 def register(files):
     username = files.get("username")
     password = files.get("password")
-    if user_exist(username, password):
+    if username_exist(username):
         socket.send_multipart([json.dumps({"user_exist": True}).encode("utf-8")])
         return
     db.users.insert_one({"username": username, "password": password})
@@ -137,6 +142,7 @@ def decide_command(request):
         not user_exist(username, password)
         and command != "server_on"
         and command != "server_off"
+        and command != "register"
     ):
         socket.send_multipart([json.dumps({"unauthorized": True}).encode("utf-8")])
         return
