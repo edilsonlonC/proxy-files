@@ -20,11 +20,11 @@ def upload(response_proxy, filename):
     parts_hash = response_proxy.get("hash_parts")
     file = open(filename, "rb")
     print("uploading file")
-    sockets_instanced = {}
+    sockets_created = {}
     for s in range(len(servers_list)):
         bytes_to_send = file.read(size)
         json_server = json.dumps(servers_list[s])
-        socket = sockets_instanced.get(json_server)
+        socket = sockets_created.get(json_server)
         if socket:
             socket.send_multipart(
                 [
@@ -41,7 +41,7 @@ def upload(response_proxy, filename):
             context_server = zmq.Context()
             socket_server = context_server.socket(zmq.REQ)
             socket_server.connect(f"tcp://{address}:{port}")
-            sockets_instanced[json_server] = socket_server
+            sockets_created[json_server] = socket_server
             socket_server.send_multipart(
                 [
                     parts_hash[s].encode("utf-8"),
@@ -140,11 +140,11 @@ def download(response, filename):
     if files.get("new_name"):
         filename = files.get("new_name")
     with open(filename, "ab") as f:
-        sockets_instanced = {}
+        sockets_created = {}
         print("downloading file")
         for s in range(len(servers)):
             json_server = json.dumps(servers[s])
-            socket = sockets_instanced.get(json_server)
+            socket = sockets_created.get(json_server)
             if socket:
                 socket.send_multipart(
                     [
@@ -160,7 +160,7 @@ def download(response, filename):
                 context_server = zmq.Context()
                 socket_server = context_server.socket(zmq.REQ)
                 socket_server.connect(f"tcp://{address}:{port}")
-                sockets_instanced[json_server] = socket_server
+                sockets_created[json_server] = socket_server
                 socket_server.send_multipart(
                     [
                         hash_parts[s].encode("utf-8"),
