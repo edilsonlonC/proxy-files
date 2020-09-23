@@ -19,7 +19,7 @@ def upload(response_proxy, filename):
     servers_list = response_proxy.get("servers")
     parts_hash = response_proxy.get("hash_parts")
     file = open(filename, "rb")
-    print('uploading file')
+    print("uploading file")
     sockets_instanced = {}
     for s in range(len(servers_list)):
         bytes_to_send = file.read(size)
