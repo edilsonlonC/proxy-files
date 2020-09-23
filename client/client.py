@@ -33,7 +33,6 @@ def upload(response_proxy, filename):
                     bytes_to_send,
                 ]
             )
-            print(sockets_instanced)
             response = socket.recv_multipart()
         else:
 
@@ -83,6 +82,11 @@ def list_files(args):
         if files_list.get("unauthorized"):
             print("access denied")
             return
+    
+    if not files_list:
+        print("you don't have files")
+        return
+        
     message = string_response(files_list)
     print(message)
     return
@@ -102,7 +106,7 @@ def get_servers_proxy(args):
         response = socket.recv_multipart()
         json_response = json.loads(response[0])
         if json_response.get("file_exist"):
-            print("file exist")
+            print(f"the file with name {filename} already exists")
             return
         elif json_response.get("unauthorized"):
             print("access dienied")
@@ -173,7 +177,7 @@ def proxy_download(args):
     json_response = json.loads(response[0])
 
     if json_response.get("FileNotFound"):
-        print("file does not exists")
+        print("file does not exist")
         return
     if json_response.get("unauthorized"):
         print("access denied")
