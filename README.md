@@ -6,7 +6,7 @@
 
 
 <h3> Comandos para el cliente </h3>
- :arrow_right: register username <br>s
+:arrow_right: register username <br>
 :arrow_right: upload filename username <br>
 :arrow_right: download filename username <br>
 :arrow_right: list username <br>
