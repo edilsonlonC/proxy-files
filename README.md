@@ -6,20 +6,20 @@
 
 
 <h3> Comandos para el cliente </h3>
- :arrow_right: register username
-:arrow_right: upload filename username
-:arrow_right: download filename username
-:arrow_right: list username
+ :arrow_right: register username <br>
+:arrow_right: upload filename username <br>
+:arrow_right: download filename username <br>
+:arrow_right: list username <br>
 
 
 <h4> Ejecutar programa </h4>
 '''
-git clone https://github.com/edilsonlonC/proxy-files.git
-cd proxy
-python main.py
-cd server
-./execute_server.sh
-cd client 
-./client.py command
+git clone https://github.com/edilsonlonC/proxy-files.git <br>
+cd proxy <br>
+python main.py <br>
+cd server <br>
+./execute_server.sh <br>
+cd client <br>
+./client.py command <br>
 '''
 
