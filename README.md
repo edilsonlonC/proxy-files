@@ -13,7 +13,7 @@
 
 
 <h4> Ejecutar programa </h4>
-'''
+''' bash
 git clone https://github.com/edilsonlonC/proxy-files.git <br>
 cd proxy <br>
 python main.py <br>
