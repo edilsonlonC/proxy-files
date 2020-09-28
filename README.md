@@ -6,10 +6,10 @@
 
 
 <h3> Comandos para el cliente </h3>
-:arrow_right register username
-:arrow_right upload filename username
-:arrow_right download filename username
-:arrow_right list username
+ :arrow_right: register username
+:arrow_right: upload filename username
+:arrow_right: download filename username
+:arrow_right: list username
 
 
 <h4> Ejecutar programa </h4>
