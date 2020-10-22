@@ -7,6 +7,7 @@ import os
 context = zmq.Context()
 socket = context.socket(zmq.REP)
 port = sys.argv[1]
+my_ip = sys.argv[4]
 socket.bind(f"tcp://*:{port}")
 # address proxy
 server_info = {}
@@ -39,7 +40,8 @@ def get_args():
     server_info["files_folder"] = files_folder
     server_info["port"] = port
     server_info["address_proxy"] = address_proxy
-    server_info["address"] = "localhost"
+    server_info["address"] = my_ip
+    print(server_info)
     server_info["command"] = "server_on"
     send_info_proxy(address_proxy)
 

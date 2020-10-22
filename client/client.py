@@ -10,9 +10,20 @@ import os
 
 files = {}
 size = 1024 * 1024 * 10
+proxy_address = ''
+
+try:
+    if sys.argv[1] == 'list':
+        proxy_address = sys.argv[3]
+    else :
+        proxy_address = sys.argv[4]
+except IndexError:
+    print('Arguments are missing')
+
+print(proxy_address)
 context = zmq.Context()
 socket = context.socket(zmq.REQ)
-socket.connect("tcp://localhost:5556")
+socket.connect(f"tcp://{proxy_address}")
 
 
 def upload(response_proxy, filename):
@@ -218,4 +229,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except IndexError:
+        print('Arguments are missing')

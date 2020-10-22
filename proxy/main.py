@@ -74,7 +74,7 @@ def download(request):
     # hash_and_servers =  db.users.find_one({'username': username,'password':password,f"{name}.ext":ext},{name:1,'_id':0})
     hash_and_servers = db.files.find_one(
         {"username": username, "filename": filename}, {"_id": 0}
-    )  # TODO check if file exist en db
+    )
     if not hash_and_servers:
         socket.send_multipart([json.dumps({"FileNotFound": True}).encode("utf-8")])
         return
