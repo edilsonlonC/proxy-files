@@ -13,7 +13,7 @@ size = 1024 * 1024 * 10
 proxy_address = ''
 
 try:
-    if sys.argv[1] == 'list':
+    if sys.argv[1] == 'list' or sys.argv[1] == 'register':
         proxy_address = sys.argv[3]
     else :
         proxy_address = sys.argv[4]
