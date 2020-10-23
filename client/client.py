@@ -137,7 +137,7 @@ def register(args):
     response = socket.recv_multipart()
     json_response = json.loads(response[0])
     if json_response.get("user_saved"):
-        print(f"the user f{files.get('username')} was created")
+        print(f"the user {files.get('username')} was created")
         return
     if json_response.get("user_exist"):
         print(f"the user {files.get('username')} already exists")
